@@ -1,5 +1,100 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+void main() => runApp(GetMaterialApp(home: Home()));
+
+// 비니지스 로직 클래스를 만들고, 모든 변수, 함수, 컨트롤러를 포함
+// .obs는 간단히 모든 변수를 observable로 만들 수 있음
+class Controller extends GetxController {
+  var count = 1.obs;
+  increment() => count++;
+}
+
+class Home extends StatelessWidget {
+  @override
+  Widget build(context) {
+    // Get.put()을 사용하여 클래스를 인스턴스화하여 모든 "child'에서 사용가능하게 합니다.
+    final Controller c = Get.put(Controller());
+
+    return Scaffold(
+        // count가 변경 될 때마다 Obx(()=> 를 사용하여 Text()에 업데이트합니다.
+        appBar: AppBar(title: Obx(() => Text("Clicks: ${c.count}"))),
+
+        // 8줄의 Navigator.push를 간단한 Get.to()로 변경합니다. context는 필요없습니다.
+        body: Center(
+          child: ElevatedButton(
+              child: Text("Go to Other"), onPressed: () => Get.to(Other())),
+        ),
+        floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add), onPressed: c.increment));
+  }
+}
+
+class Other extends StatelessWidget {
+  // 다른 페이지에서 사용되는 컨트롤러를 Get으로 찾아서 redirect 할 수 있습니다.
+  final Controller c = Get.find();
+
+  @override
+  Widget build(context) {
+    // 업데이트된 count 변수에 연결
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("just first other page"),
+      ),
+      body: Center(
+        //Obx(() => Text()) 요렇게 가면 계속 업데이트가 된다.
+        child: Column(
+          children: [
+            Obx(() => Text("${c.count}")),
+            ElevatedButton(
+              onPressed: () => Get.to(Other2()),
+              child: Text("Go to one more"),
+            )
+          ],
+          /*Obx(
+            () => Text("${c.count}"),
+          ),*/
+        ),
+      ),
+      floatingActionButton:
+          FloatingActionButton(child: Icon(Icons.add), onPressed: c.increment),
+    );
+  }
+}
+
+class Other2 extends StatelessWidget {
+  // 다른 페이지에서 사용되는 컨트롤러를 Get으로 찾아서 redirect 할 수 있습니다.
+  final Controller c = Get.find();
+
+  @override
+  Widget build(context) {
+    // 업데이트된 count 변수에 연결
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("just second other page"),
+      ),
+      body: Center(
+        //Obx(() => Text()) 요렇게 가면 계속 업데이트가 된다.
+        child: Column(
+          children: [
+            Obx(() => Text("${c.count}")),
+            ElevatedButton(
+              onPressed: () => Get.to(Other()),
+              child: Text("Go to one more"),
+            )
+          ],
+          /*Obx(
+            () => Text("${c.count}"),
+          ),*/
+        ),
+      ),
+      floatingActionButton:
+          FloatingActionButton(child: Icon(Icons.add), onPressed: c.increment),
+    );
+  }
+}
+
+/*
 void main() {
   runApp(MyApp());
 }
@@ -111,3 +206,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+*/
